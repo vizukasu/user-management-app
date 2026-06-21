@@ -1,24 +1,23 @@
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, 
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD, 
-  },
-  connectionTimeout: 10000,
-});
-
 function sendVerificationEmail(toEmail, token) {
   const link = `${process.env.PUBLIC_APP_URL}/api/auth/verify?token=${token}`;
-  transporter
-    .sendMail({
-      from: process.env.GMAIL_USER,
+
+  fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "onboarding@resend.dev",
       to: toEmail,
       subject: "Confirm your account",
       html: `<p>Click to confirm your account:</p><p><a href="${link}">${link}</a></p>`,
+    }),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        console.error("Failed to send verification email:", await res.text());
+      }
     })
     .catch((err) => console.error("Failed to send verification email:", err.message));
 }
