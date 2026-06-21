@@ -1,20 +1,18 @@
-// important: trivial mail sending via Gmail account, explicitly allowed by the
-// task description for testing purposes ("5-10 mails per day" is fine).
-// note: sent asynchronously, never blocks the registration response.
-
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, 
   auth: {
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD, // note: must be a Gmail "app password", not the normal password
+    pass: process.env.GMAIL_APP_PASSWORD, 
   },
+  connectionTimeout: 10000,
 });
 
 function sendVerificationEmail(toEmail, token) {
   const link = `${process.env.PUBLIC_APP_URL}/api/auth/verify?token=${token}`;
-  // nota bene: fire-and-forget, registration must not wait for this
   transporter
     .sendMail({
       from: process.env.GMAIL_USER,
