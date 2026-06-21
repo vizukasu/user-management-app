@@ -4,7 +4,7 @@
 // in every controller/route — every protected route just uses this middleware.
 
 const jwt = require("jsonwebtoken");
-const pool = require("./db/pool");
+const pool = require("../db/pool");
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 
